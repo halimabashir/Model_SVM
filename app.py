@@ -13,8 +13,9 @@ with open ('pickle_model.pkl', 'rb') as file:
     pickle_model = pickle.load(file)
 tfidfvect = pickle.load(open('tfidfvect.pkl', 'rb'))
 
+
 def predict(text):
-    review = re.sub('[^a-zA-Z]', ' ', text)
+    review = re.sub('[^a-zA-Z]', ' ', str(text))
     review = review.lower()
     review = review.split()
     review = [ps.stem(word) for word in review if not word in stopwords.words('english')]
@@ -24,11 +25,13 @@ def predict(text):
     return prediction
 
 
-@app.route('/predict', methods=['GET','POST'])
+@app.route('/predict', methods=['POST'])
 def api():
-    text = request.args.get("text")
-    prediction = predict(text)
-    return jsonify(prediction=prediction)
+
+    if request.method == 'POST':
+        text = request.form.get("text")
+        prediction = predict(text)
+        return jsonify(prediction=prediction)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
